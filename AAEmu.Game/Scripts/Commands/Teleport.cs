@@ -147,9 +147,52 @@ namespace AAEmu.Game.Scripts.Commands
                     }
                 }
             }
+            else if (args.Length == 2)
+            {
+                character.SendMessage("/teleport " + args[0] + " " + args[1]);
+                var n = args[1].ToLower();
+                var target = WorldManager.Instance.GetCharacter(args[0]);
+
+                if (target == null)
+                {
+                    character.SendMessage("The character " + args[0] + " is not online or does not exist.");
+                }
+
+                bool foundIt = false;
+                foreach (TPloc item in locations)
+                {
+                    if (item.Name == n)
+                    {
+                        foundIt = true;
+                    }
+                    else if (item.AltNames != null)
+                    {
+                        foreach (string alt in item.AltNames)
+                        {
+                            if (alt == n)
+                            {
+                                foundIt = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (foundIt)
+                    {
+                        character.SendMessage("Teleporting" + args[0] + " to |cFFFFFFFF" + item.Info + "|r");
+                        target.DisabledSetPosition = true;
+                        target.SendPacket(new SCTeleportUnitPacket(0, 0, item.X, item.Y, item.Z, 0));
+
+                        break;
+                    }
+                }
+                if (!foundIt)
+                {
+                    character.SendMessage("|cFFFF0000[Teleport] Unavailable Location [" + args[1] + "]|r");
+                }
+            }
             else
             {
-                character.SendMessage("Usage : " + CommandManager.CommandPrefix + "teleport <Location>\n" +
+                character.SendMessage("Usage : " + CommandManager.CommandPrefix + "teleport (Name) <Location>\n" +
                     "Use a period (.) to teleport to YOUR marked location on the map, or use one of the following locations :");
                 List<string> sb = new List<string>();
                 foreach (TeleportCommandRegions r in System.Enum.GetValues(typeof(TeleportCommandRegions)) )

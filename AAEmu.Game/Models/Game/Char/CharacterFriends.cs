@@ -24,7 +24,7 @@ namespace AAEmu.Game.Models.Game.Char
             var friend = FriendMananger.Instance.GetFriendInfo(name);
             if (friend == null || FriendsIdList.ContainsKey(friend.CharacterId))
             {
-                // TODO - ERROR MESSAGE ALREADY ADDED
+                Owner.SendMessage("This player does not exist!");
                 return;
             }
 
